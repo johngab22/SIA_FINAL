@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block content %}
+<section class="detail-hero">
+    <div class="poster-shell">
+        {% include "movies/partials/poster.html" with movie=movie large=True %}
+    </div>
+    <div class="detail-copy">
+        <p class="eyebrow">Movie details</p>
+        <h1>{{ movie.title }}</h1>
+        <div class="detail-tags">
+            {% if movie.release_date %}
+                <span>{% include "partials/icon.html" with name="calendar" %} Released {{ movie.release_date|date:"F j, Y" }}</span>
+            {% endif %}
+            <span>{% include "partials/icon.html" with name="film" %} TMDb movie</span>
+        </div>
+        <p class="overview">{{ movie.overview|default:"No overview available." }}</p>
+
+        {% if user.is_authenticated %}
+            {% if saved_movie %}
+                <p class="saved-note">{% include "partials/icon.html" with name="bookmark" %}<span>Saved in your list.</span></p>
+                <a class="button" href="{% url 'review_movie' saved_movie.movie.id %}">
+                    {% include "partials/icon.html" with name="star" %}
+                    <span>{% if review %}Edit review{% else %}Write review{% endif %}</span>
+                </a>
+            {% else %}
+                <form method="post" action="{% url 'save_movie' movie.tmdb_id %}">
+                    {% csrf_token %}
+                    <button type="submit">{% include "partials/icon.html" with name="bookmark" %}<span>Save movie</span></button>
+                </form>
+            {% endif %}
+        {% else %}
+            <a class="button" href="{% url 'login' %}?next={{ request.path }}">{% include "partials/icon.html" with name="user" %}<span>Log in to save</span></a>
+        {% endif %}
+    </div>
+</section>
+
+{% if similar_movies %}
+    <section class="recommendations glass-panel" data-slider>
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Recommended next</p>
+                <h2>More movies like this</h2>
+            </div>
+            <div class="slider-actions" aria-label="Slider controls">
+                <button type="button" class="slider-button" data-slider-prev aria-label="Previous movies">
+                    {% include "partials/icon.html" with name="chevron-left" %}
+                </button>
+                <button type="button" class="slider-button" data-slider-next aria-label="Next movies">
+                    {% include "partials/icon.html" with name="chevron-right" %}
+                </button>
+            </div>
+        </div>
+        <div class="slider-shell">
+            <div class="movie-row" data-slider-track tabindex="0" aria-label="More movies like this">
+                {% for similar in similar_movies %}
+                    <article class="mini-card">
+                        <a href="{% url 'movie_detail' similar.tmdb_id %}" aria-label="View {{ similar.title }}">
+                            {% include "movies/partials/poster.html" with movie=similar %}
+                            <span>{{ similar.title }}</span>
+                        </a>
+                    </article>
+                {% endfor %}
+            </div>
+            <div class="slider-progress" aria-hidden="true">
+                <span data-slider-progress></span>
+            </div>
+        </div>
+    </section>
+{% endif %}
+{% endblock %}

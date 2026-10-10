@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Review {{ saved_movie.movie.title }}{% endblock %}
+
+{% block content %}
+<section class="form-panel">
+    <p class="eyebrow">Your review</p>
+    <h1>{{ saved_movie.movie.title }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <label for="{{ form.body.id_for_label }}">Review</label>
+        {{ form.body }}
+        {{ form.body.errors }}
+        <div class="actions">
+            <button type="submit">Save review</button>
+            <a class="button secondary" href="{% url 'saved_movies' %}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

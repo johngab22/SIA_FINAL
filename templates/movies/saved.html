@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}My Movies{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <p class="eyebrow">Personal collection</p>
+    <h1>My movies</h1>
+    <p>Your saved movies and private reviews.</p>
+</section>
+
+{% if saved_movies %}
+    <div class="saved-list">
+        {% for saved in saved_movies %}
+            <article class="saved-item">
+                {% include "movies/partials/poster.html" with movie=saved.movie %}
+                <div>
+                    <h2>{{ saved.movie.title }}</h2>
+                    {% if saved.movie.release_date %}<p class="meta">{{ saved.movie.release_date|date:"Y" }}</p>{% endif %}
+                    <p>{{ saved.movie.overview|truncatewords:34|default:"No overview available." }}</p>
+                    {% for movie_id, review in reviews.items %}
+                        {% if movie_id == saved.movie.id %}
+                            <blockquote>{{ review.body }}</blockquote>
+                        {% endif %}
+                    {% endfor %}
+                    <div class="actions">
+                        <a class="button secondary" href="{% url 'movie_detail' saved.movie.tmdb_id %}">{% include "partials/icon.html" with name="play" %}<span>Details</span></a>
+                        <a class="button" href="{% url 'review_movie' saved.movie.id %}">{% include "partials/icon.html" with name="star" %}<span>Review</span></a>
+                        <form method="post" action="{% url 'remove_saved_movie' saved.movie.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="danger">{% include "partials/icon.html" with name="trash" %}<span>Remove</span></button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="empty-state">Your list is empty. Search for a movie and save one.</p>
+{% endif %}
+{% endblock %}

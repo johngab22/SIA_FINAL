@@ -1,0 +1,9 @@
+{% if movie.poster_path %}
+    <img class="poster {% if large %}large{% endif %}" src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }} poster" loading="lazy">
+{% elif movie.poster_url %}
+    <img class="poster {% if large %}large{% endif %}" src="{{ movie.poster_url }}" alt="{{ movie.title }} poster" loading="lazy">
+{% else %}
+    <div class="poster placeholder {% if large %}large{% endif %}" aria-label="No poster available">
+        <span>No poster</span>
+    </div>
+{% endif %}

@@ -1,0 +1,43 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Cabaluna Movies{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="{% static 'js/slider.js' %}" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="{% url 'home' %}">
+            <span class="brand-mark" aria-hidden="true">CM</span>
+            <span class="brand-word">Cabaluna</span>
+        </a>
+        <nav class="nav">
+            <a href="{% url 'home' %}">{% include "partials/icon.html" with name="search" %}<span>Search</span></a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'saved_movies' %}">{% include "partials/icon.html" with name="bookmark" %}<span>My Movies</span></a>
+                <form action="{% url 'logout' %}" method="post" class="inline-form">
+                    {% csrf_token %}
+                    <button type="submit" class="link-button">{% include "partials/icon.html" with name="log-out" %}<span>Log out</span></button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">{% include "partials/icon.html" with name="user" %}<span>Log in</span></a>
+                <a class="button small" href="{% url 'register' %}">Register</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main class="container">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p class="message {{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

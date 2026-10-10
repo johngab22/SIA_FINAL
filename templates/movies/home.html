@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Search Movies{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <p class="eyebrow">Streamlined movie discovery</p>
+        <h1>Find your next watch, then keep your own review reel.</h1>
+        <p>Search TMDb by title, genre, release year, or movie category and save the best finds to your list.</p>
+    </div>
+</section>
+
+<form class="search-form" method="get">
+    <div class="search-row primary-search">
+        <div>
+            <label for="q">Movie title</label>
+            <input id="q" type="search" name="q" value="{{ query }}" placeholder="Search for Dune, Inception, Parasite...">
+        </div>
+        <button type="submit">{% include "partials/icon.html" with name="search" %}<span>Search</span></button>
+    </div>
+    <div class="filter-row" aria-label="Search filters">
+        <div>
+            <label for="genre">{% include "partials/icon.html" with name="tag" %}<span>Genre</span></label>
+            <select id="genre" name="genre">
+                <option value="">Any genre</option>
+                {% for genre in genres %}
+                    <option value="{{ genre.id }}" {% if selected_genre == genre.id|stringformat:"s" %}selected{% endif %}>{{ genre.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="year">{% include "partials/icon.html" with name="calendar" %}<span>Year released</span></label>
+            <input id="year" type="number" name="year" value="{{ selected_year }}" min="1888" max="2100" placeholder="2024">
+        </div>
+        <div>
+            <label for="category">{% include "partials/icon.html" with name="film" %}<span>Kind of movie</span></label>
+            <select id="category" name="category">
+                <option value="" {% if not selected_category %}selected{% endif %}>Popular picks</option>
+                <option value="top_rated" {% if selected_category == "top_rated" %}selected{% endif %}>Top rated</option>
+                <option value="now_playing" {% if selected_category == "now_playing" %}selected{% endif %}>Now playing</option>
+                <option value="upcoming" {% if selected_category == "upcoming" %}selected{% endif %}>Upcoming</option>
+            </select>
+        </div>
+    </div>
+</form>
+
+{% if has_filters %}
+    <div class="section-heading">
+        <h2>{% if query %}Results for "{{ query }}"{% else %}Movie matches{% endif %}</h2>
+        <a href="{% url 'home' %}">Clear filters</a>
+    </div>
+    {% if movies %}
+        <div class="movie-grid">
+            {% for movie in movies %}
+                <article class="movie-card">
+                    <a href="{% url 'movie_detail' movie.tmdb_id %}" aria-label="View {{ movie.title }}">
+                        {% include "movies/partials/poster.html" with movie=movie %}
+                    </a>
+                    <div class="movie-card-body">
+                        <h3>{{ movie.title }}</h3>
+                        {% if movie.release_date %}<p class="meta">{{ movie.release_date|date:"Y" }}</p>{% endif %}
+                        <p>{{ movie.overview|truncatewords:26|default:"No overview available." }}</p>
+                        <a class="button secondary" href="{% url 'movie_detail' movie.tmdb_id %}">
+                            {% include "partials/icon.html" with name="play" %}
+                            <span>View details</span>
+                        </a>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">No movies found. Try another title.</p>
+    {% endif %}
+{% else %}
+    <p class="empty-state">Start with a title, genre, release year, or category to load movies from TMDb.</p>
+{% endif %}
+{% endblock %}

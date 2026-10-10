@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Log in{% endblock %}
+
+{% block content %}
+<section class="auth-shell">
+    <aside class="auth-showcase">
+        <a class="auth-back" href="{% url 'home' %}">Back to website</a>
+        <div class="auth-showcase-copy">
+            <p class="eyebrow">Your watchlist waits</p>
+            <h2>Return to your saved films and reviews.</h2>
+            <div class="auth-dots" aria-hidden="true"><span></span><span></span><span class="active"></span></div>
+        </div>
+    </aside>
+
+    <div class="auth-card">
+        <p class="eyebrow">Welcome back</p>
+        <h1>Log in</h1>
+        <p class="auth-switch">Need an account? <a href="{% url 'register' %}">Create one</a></p>
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <label for="{{ form.username.id_for_label }}">Username</label>
+            {{ form.username }}
+            {{ form.username.errors }}
+            <label for="{{ form.password.id_for_label }}">Password</label>
+            {{ form.password }}
+            {{ form.password.errors }}
+            <button type="submit">Log in</button>
+        </form>
+    </div>
+</section>
+{% endblock %}
